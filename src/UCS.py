@@ -28,13 +28,14 @@ class UCS :
         print("Jalur hasil :",currNode.prevPath)
 
 class UCSOSMNX :
+    @staticmethod
     def searchPath(startNode,destNode,graph) :
         # Mencari jalur terpendek berdasarkan panjang 
         if (startNode not in graph or destNode not in graph) :
             print("Coordinate not found in area")
         else :
             if (startNode == destNode) :
-                return [startNode]
+                return [startNode],0
             liveNodes = []
             visitedNodes = []
             currNode = NodeUCS(startNode,0,0,[startNode])
