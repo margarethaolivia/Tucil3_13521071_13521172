@@ -24,6 +24,8 @@ root.title("PathFinder A* & UCS")  # title of the GUI window
 root.geometry(f"{1400}x{700}")  # specify the max size the window can expand to
 root.config(bg="skyblue")  # specify background color
 
+searchModeMap = IntVar()
+
 def openFile() :
     global file_path
     file_path = askopenfile(mode='r', filetypes=[('text files', '*.txt')])
@@ -56,13 +58,20 @@ def add_end_coord(coords):
     print("Add end point:", coords)
     endMarker = map_widget.set_marker(coords[0], coords[1], text="end")
 
-def search_map() :
+def search_map(mode='walk') :
     map_widget.delete_all_path()
-    shortest_route, shortest_distance, graph = Map.MapPathSearch.search(startCoord,endCoord)
+    if (searchModeMap.get() == 1) : # UCS
+        method = 'UCS'
+    elif (searchModeMap.get() == 2) : # Built In
+        method = 'BuiltIn'
+    else :
+        dist_lbl["text"] = "Select a serch method first !"
+        return
+    shortest_route, shortest_distance, graph = Map.MapPathSearch.search(startCoord,endCoord,mode,method)
     shortest_route_coor = Map.MapPathSearch.convertPathToCoorPath(shortest_route,graph)
     map_widget.set_position(startCoord[0],startCoord[1])
     map_widget.set_zoom(16)
-    dist_lbl["text"] = "Shortest distance : " + str(shortest_distance)
+    dist_lbl["text"] = "Shortest distance : " + str(shortest_distance) + " meters"
     path = map_widget.set_path(shortest_route_coor,color="red")
 
 # Graph frame
@@ -85,7 +94,13 @@ searchGraphBtn.place(relx=0.3,rely=0.9)
 
 # Search Map button
 searchMapBtn = Button(map_frame,text="Search Map",command=search_map,state="disabled")
-searchMapBtn.place(relx=0.5,rely=0.7)
+searchMapBtn.place(relx=0.45,rely=0.7)
+
+# Search mode select button map
+UCSMapBtn = Radiobutton(map_frame,text="UCS", variable=searchModeMap, value=1)
+UCSMapBtn.place(relx=0.45,rely=0.75)
+BuiltInMapBtn = Radiobutton(map_frame,text="Built in", variable=searchModeMap, value=2)
+BuiltInMapBtn.place(relx=0.45,rely=0.8)
 
 # Map widget
 map_widget = tkMap.TkinterMapView(map_frame, width=500, height=350, corner_radius=0)
