@@ -12,7 +12,7 @@ class MapPathSearch :
         nodes = ox.graph_to_gdfs(graph,edges=False)
         for n in nodePath :
             nodeData = nodes.loc[n]
-            coorPath.append((nodeData['x'],nodeData['y']))
+            coorPath.append((nodeData['y'],nodeData['x']))
         return coorPath
 
     def search(startCoor, endCoor, mode='walk') :

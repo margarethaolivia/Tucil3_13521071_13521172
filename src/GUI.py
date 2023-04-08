@@ -91,7 +91,7 @@ searchMapBtn.place(relx=0.5,rely=0.7)
 map_widget = tkMap.TkinterMapView(map_frame, width=500, height=350, corner_radius=0)
 map_widget.place(relx=0.1,rely=0.1)
 dist_lbl = Label(map_frame,text="Shortest distance :")
-dist_lbl.place(relx=0.5,rely=0.3)
+dist_lbl.place(relx=0.4,rely=0.6)
 
 map_widget.add_right_click_menu_command(label="Add start point",
                                         command=add_start_coord,
