@@ -14,8 +14,6 @@ class UCS :
                     liveNodes.put(Node(i, currNode.distFromRoot+matrix[currNode.number][i],
                                        0, currNode.prevPath + [currNode.number], True))
             currNode = liveNodes.get()
+        print("---- UCS ALGORITHM ----")
         print(f"Jarak minimum : {currNode.distFromRoot}")
         print("Jalur hasil :",currNode.prevPath+[currNode.number])
-
-m = Graph.readMatrix("D:\OneDrive - Institut Teknologi Bandung\Folder Kuliah\Sem 4\Stima\Tubes3\Tucil3_13521071_13521172\doc\dummy.txt")
-ucs = UCS(0,6,m)
