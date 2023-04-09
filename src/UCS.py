@@ -1,4 +1,3 @@
-from queue import PriorityQueue
 from Utils import NodeUCS
 from Utils import Graph
 import osmnx as ox
@@ -33,6 +32,7 @@ class UCSOSMNX :
         # Mencari jalur terpendek berdasarkan panjang 
         if (startNode not in graph or destNode not in graph) :
             print("Coordinate not found in area")
+            return
         else :
             if (startNode == destNode) :
                 return [startNode],0
@@ -42,7 +42,14 @@ class UCSOSMNX :
             edges = ox.graph_to_gdfs(graph,nodes=False)
             while (currNode.number != destNode) :
                 visitedNodes.append(currNode.number)
-                neighbour = edges['length'].loc[currNode.number]
+                try :
+                    neighbour = edges['length'].loc[currNode.number]
+                except :
+                    if (len(liveNodes) == 0) : 
+                        return
+                    currNode = liveNodes[0]
+                    liveNodes.remove(currNode)
+                    continue
                 for idx,l in neighbour.items() :
                     if ((idx[0]) not in set(visitedNodes)) :
                         foundSmaller = False
@@ -56,6 +63,8 @@ class UCSOSMNX :
                         if (not(foundSmaller)) :
                             liveNodes.append(NodeUCS(idx[0],currNode.distFromRoot + l,0,
                                             currNode.prevPath + [idx[0]]))
+                if (len(liveNodes) == 0) :
+                    return
                 liveNodes.sort(key=lambda x : x.distFromRoot)
                 currNode = liveNodes[0]
                 liveNodes.remove(currNode)

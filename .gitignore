@@ -22,3 +22,4 @@ src/__pycache__/Map.cpython-310.pyc
 src/__pycache__/UCS.cpython-310.pyc
 src/__pycache__/Utils.cpython-310.pyc
 *.json
+*.pyc
