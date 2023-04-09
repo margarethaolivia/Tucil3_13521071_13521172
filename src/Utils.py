@@ -11,16 +11,25 @@ class NodeUCS :
     def __lt__(self,other) :
         return self.distFromRoot < other.distFromRoot
 
-class Graph :
-    def readMatrix(fileName) :
+class Graph:
+    def readMatrix(fileName):
         f = open(fileName, "r")
+        total_lines = len(f.readlines())
+        total_nodes = total_lines // 2
         m = []
-        for lines in f.readlines() :
-            m.append([int(x) for x in lines.split(' ')])
+        coord = []
+        f.seek(0)
+        lines = f.readlines()
+        for i in range(total_nodes):
+            m.append([int(x) for x in lines[i].split(' ')])
+
+        for i in range(total_nodes, total_lines):
+            coord.append([int(x) for x in lines[i].split(' ')])
+
         f.close()
-        return m
-    def indexValid(i,mtrx) :
+        return m, coord
+   def indexValid(i,mtrx) :
         # checks if index i,j is valid in matrix mtrx
         return (i >= 0 and i < len(mtrx))
-    def eucliDistance(x1,y1,x2,y2) :
+   def eucliDistance(x1,y1,x2,y2) :
         return math.sqrt(pow(x2*111139-x1*111139,2) + pow(y2*111139-y1*111139,2))
