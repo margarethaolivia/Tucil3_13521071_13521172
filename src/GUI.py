@@ -6,15 +6,20 @@ import tkintermapview as tkMap
 import customtkinter as ctk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
+import networkx as nx
 from pathlib import Path
 import UCS
 import Utils
 import Map
+import AStar
 
 startCoord = None
 endCoord = None
 startMarker = None
 endMarker = None
+m = None
+coord = None
 
 root = ctk.CTk()  # create root window
 root.title("PathFinder A* & UCS")  # title of the GUI window
@@ -24,16 +29,18 @@ searchModeMap = IntVar()
 searchModeGraph = IntVar()
 
 def openFile() :
-    global file_path
+    global file_path,m,coord
     file_path = askopenfile(mode='r', filetypes=[('text files', '*.txt')])
     if file_path is not None:
         fName = Path(file_path.name)
         filename.configure(text="File name : " + fName.name)
         searchGraphBtn.configure(state=NORMAL)
+        m,coord = Utils.Graph.readMatrix(file_path.name)
+        plotGraph(m,coord)
 
 def searchGraph() :
-    m = Utils.Graph.readMatrix(file_path.name)
-    a = UCS.UCS(0,6,m)
+    if(searchModeGraph == 1) :
+        shortest_route, shortest_dist = UCS.UCS.searchPath(0,6,m)
 
 # Map functions
 def add_start_coord(coords):
@@ -90,14 +97,32 @@ def search_loc_map() :
         errorMapLbl.configure(text="Location not found", text_color="red")
         errorMapLbl.place(relx=0.53,rely=0.73)
 
+def plotGraph(m, coord):
+    adj_matrix = np.array(m)
+
+    # Create a directed weighted graph from the weighted directed adjacency matrix
+    graph = nx.Graph(adj_matrix)
+
+    # Plot the directed weighted graph
+    pos = {i: tuple(coord[i]) for i in range(len(coord))}
+
+    # Draw graph with fixed node positions and edge labels
+    a = fig.add_subplot(111)
+    nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color='lightblue',
+                     node_size=500, font_size=14, font_weight='bold')
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels={(
+        i, j): f'{adj_matrix[i, j]:.1f}' for i, j in graph.edges()}, font_size=12, font_color='red')
+    plt.axis("off")
+    canvas.draw()
+
 # Title label
 title = ctk.CTkLabel(root,text="A* and UCS Pathfinder",font=('Arial',25))
 title.place(relx=0.37,rely=0.05)
 
 # Graph display
-figure1 = plt.Figure(figsize=(6, 4), dpi=100)
-bar1 = FigureCanvasTkAgg(figure1, root)
-bar1.get_tk_widget().place(relx=0.05,rely=0.15)
+fig = plt.Figure(figsize=(6, 4), dpi=100)
+canvas = FigureCanvasTkAgg(fig, root)
+canvas.get_tk_widget().place(relx=0.05,rely=0.15)
 
 # Upload graph file button
 filename = ctk.CTkLabel(root,text="File name :")

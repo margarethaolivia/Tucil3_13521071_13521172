@@ -18,7 +18,7 @@ class MapPathSearch :
 
     def search(startCoor, endCoor, mode='walk', method='UCS') :
         # Mengembalikan list koordinat nodes dan graf (untuk keperluan fungsi lain)
-        mapping_distance = max(int(Utils.Graph.eucliDistance(startCoor[0],startCoor[1],endCoor[0],endCoor[1])), 1000)
+        mapping_distance = max(int(Utils.Graph.eucliDistanceMap(startCoor[0],startCoor[1],endCoor[0],endCoor[1])), 1000)
         if (mapping_distance > 1000) :
             graph = ox.graph_from_point(startCoor, mapping_distance, network_type='drive')
         else :

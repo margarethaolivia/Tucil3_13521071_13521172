@@ -1,30 +1,37 @@
-from Utils import NodeUCS
+from Utils import Node
 from Utils import Graph
 import osmnx as ox
 
 class UCS :
-    def __init__(self, startNodeNum, destNodeNum, matrix) :
+    @staticmethod
+    def searchPath(startNodeNum, destNodeNum, matrix) :
         if (not(Graph.indexValid(startNodeNum,matrix)) or not(Graph.indexValid(destNodeNum,matrix))) : # Periksa apakah node valid
             print("Nodes not valid")
             return
         liveNodes = []
         visitedNodesNum = []
-        currNode = NodeUCS(startNodeNum,0,0,[startNodeNum])          # Simpul ekspan
+        currNode = Node(startNodeNum,0,0,[startNodeNum])          # Simpul ekspan
         while (currNode.number != destNodeNum) :
             visitedNodesNum.append(currNode.number)
             for i in range(len(matrix[currNode.number])) : # Masukkan tetangga ke daftar simpul hidup
                 if ((i not in visitedNodesNum) and matrix[currNode.number][i] > 0) : # Hanya masukkan simpul yang belum pernah dikunjungi ke daftar simpul hidup
                     foundSmaller = False
-                    if i in liveNodes : # Hapus elemen duplikat yang lebih besar dari elemen skrng dari prioqueue
-                        liveNodes.remove(i)
+                    for n in liveNodes : # Hapus elemen duplikat yang lebih besar dari elemen skrng dari prioqueue
+                        if (n.number == i) :
+                            if (currNode.distFromRoot + matrix[currNode.number][i] < n.distFromRoot) :
+                                liveNodes.remove(n)
+                            else :
+                                foundSmaller = True
+                            break
                     if (not(foundSmaller)) :
-                        liveNodes.append(NodeUCS(i,currNode.distFromRoot + matrix[currNode.number][i],0,
+                        liveNodes.append(Node(i, currNode.distFromRoot + matrix[currNode.number][i], 0,
                                         currNode.prevPath + [i]))
+            if (len(liveNodes) == 0) : # tidak ada tetangga yang bisa dikunjungi lagi
+                return
             liveNodes.sort(key=lambda x : x.distFromRoot)
             currNode = liveNodes[0]
             liveNodes.remove(currNode)
-        print(f"Jarak minimum : {currNode.distFromRoot}")
-        print("Jalur hasil :",currNode.prevPath)
+        return currNode.prevPath, currNode.distFromRoot
 
 class UCSOSMNX :
     @staticmethod
@@ -38,7 +45,7 @@ class UCSOSMNX :
                 return [startNode],0
             liveNodes = []
             visitedNodes = []
-            currNode = NodeUCS(startNode,0,0,[startNode])
+            currNode = Node(startNode,0,0,[startNode])
             edges = ox.graph_to_gdfs(graph,nodes=False)
             while (currNode.number != destNode) :
                 visitedNodes.append(currNode.number)
@@ -61,7 +68,7 @@ class UCSOSMNX :
                                     foundSmaller = True
                                 break
                         if (not(foundSmaller)) :
-                            liveNodes.append(NodeUCS(idx[0],currNode.distFromRoot + l,0,
+                            liveNodes.append(Node(idx[0],currNode.distFromRoot + l,0,
                                             currNode.prevPath + [idx[0]]))
                 if (len(liveNodes) == 0) :
                     return
