@@ -120,7 +120,7 @@ def search_loc_map() :
         errorMapLbl.configure(text="Location not found", text_color="red")
         errorMapLbl.place(relx=0.53,rely=0.73)
 
-def plotGraph(m, coord, path=None):
+def plotGraph(m, coord, path=None, result=[]):
     adj_matrix = np.array(m)
 
     # Create a directed weighted graph from the weighted directed adjacency matrix
@@ -129,10 +129,14 @@ def plotGraph(m, coord, path=None):
     # Plot the directed weighted graph
     pos = {i: tuple(coord[i]) for i in range(len(coord))}
 
+    # Define edges in the path to be colored red
+    path_edges = []
+    for i in range(len(result)-1):
+        path_edges.append(tuple((result[i], result[i+1])))
+
     # Draw graph with fixed node positions and edge labels
     a = fig.add_subplot(111)
-    nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color='lightblue',
-                     node_size=500, font_size=14, font_weight='bold')
+    nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color='lightblue', node_size=500, font_size=14, font_weight='bold', edge_color=['red' if e in path_edges else 'black' for e in graph.edges()])
     nx.draw_networkx_edge_labels(graph, pos, edge_labels={(
         i, j): f'{adj_matrix[i, j]:.1f}' for i, j in graph.edges()}, font_size=12, font_color='red')
     plt.axis("off")
