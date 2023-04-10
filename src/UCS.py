@@ -36,10 +36,7 @@ class UCS :
 class UCSOSMNX :
     @staticmethod
     def searchPath(startNode,destNode,graph) :
-        # Mencari jalur terpendek berdasarkan panjang 
-        if (startNode not in graph or destNode not in graph) :
-            print("Coordinate not found in area")
-            return
+        # Mencari jalur terpendek berdasarkan panjang jalan
         # Jika simpul mulai sama dengan simpul tujuan
         if (startNode == destNode) :
             return [startNode],0

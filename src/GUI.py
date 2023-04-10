@@ -1,4 +1,3 @@
-import tkinter as tk
 from tkinter import *
 from tkinter.ttk import *
 from tkinter.filedialog import askopenfile
@@ -64,7 +63,15 @@ def add_start_coord(coords):
     if (startMarker != None) :
         startMarker.delete()
     print("Add start point:", coords)
-    startMarker = map_widget.set_marker(coords[0], coords[1], text="start")
+    addr = tkMap.convert_coordinates_to_address(coords[0],coords[1])
+    displayAddr = ""
+    if (addr.street != "") :
+        displayAddr += addr.street
+    if (addr.city != "") :
+        if (displayAddr != "") :
+            displayAddr += ", "
+        displayAddr += addr.city
+    startMarker = map_widget.set_marker(coords[0], coords[1], text=((displayAddr) if displayAddr != "" else "Start"))
 
 def add_end_coord(coords):
     global endCoord, endMarker
@@ -75,7 +82,15 @@ def add_end_coord(coords):
     if (endMarker != None) :
         endMarker.delete()
     print("Add end point:", coords)
-    endMarker = map_widget.set_marker(coords[0], coords[1], text="end")
+    addr = tkMap.convert_coordinates_to_address(coords[0],coords[1])
+    displayAddr = ""
+    if (addr.street != "") :
+        displayAddr += addr.street
+    if (addr.city != "") :
+        if (displayAddr != "") :
+            displayAddr += ", "
+        displayAddr += addr.city
+    endMarker = map_widget.set_marker(coords[0], coords[1], text=((displayAddr) if displayAddr != "" else "End"))
 
 def search_path_map(mode='walk') :
     map_widget.delete_all_path()

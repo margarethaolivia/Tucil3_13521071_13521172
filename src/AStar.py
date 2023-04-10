@@ -34,9 +34,6 @@ class AStarOSMNX :
     @staticmethod
     def searchPath(startNode, destNode, graph):
         # Mencari jalur terpendek berdasarkan panjang 
-        if (startNode not in graph or destNode not in graph) :
-            print("Coordinate not found in area")
-            return
         liveNodes = []
         visitedNodes= []
         nodes,edges = ox.graph_to_gdfs(graph)
