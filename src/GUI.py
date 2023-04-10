@@ -65,12 +65,10 @@ def add_start_coord(coords):
     print("Add start point:", coords)
     addr = tkMap.convert_coordinates_to_address(coords[0],coords[1])
     displayAddr = ""
-    if (addr.street != "") :
+    if (addr.street != None) :
         displayAddr += addr.street
-    if (addr.city != "") :
-        if (displayAddr != "") :
-            displayAddr += ", "
-        displayAddr += addr.city
+    if (addr.city != None and displayAddr != "") :
+        displayAddr += ", " + addr.city
     startMarker = map_widget.set_marker(coords[0], coords[1], text=((displayAddr) if displayAddr != "" else "Start"))
 
 def add_end_coord(coords):
@@ -84,12 +82,10 @@ def add_end_coord(coords):
     print("Add end point:", coords)
     addr = tkMap.convert_coordinates_to_address(coords[0],coords[1])
     displayAddr = ""
-    if (addr.street != "") :
+    if (addr.street != None) :
         displayAddr += addr.street
-    if (addr.city != "") :
-        if (displayAddr != "") :
-            displayAddr += ", "
-        displayAddr += addr.city
+    if (addr.city != None and displayAddr != "") :
+        displayAddr += ", " + addr.city
     endMarker = map_widget.set_marker(coords[0], coords[1], text=((displayAddr) if displayAddr != "" else "End"))
 
 def search_path_map(mode='walk') :
