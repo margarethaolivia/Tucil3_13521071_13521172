@@ -136,7 +136,7 @@ def plotGraph(m, coord, path=None, result=[]):
 
     # Draw graph with fixed node positions and edge labels
     a = fig.add_subplot(111)
-    nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color='lightblue', node_size=500, font_size=14, font_weight='bold', edge_color=['red' if e in path_edges else 'black' for e in graph.edges()])
+    nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color=['blue' if e in result else 'lightblue' for e in graph.nodes()], node_size=500, font_size=14, font_weight='bold', edge_color=['blue' if e in path_edges else 'black' for e in graph.edges()])
     nx.draw_networkx_edge_labels(graph, pos, edge_labels={(
         i, j): f'{adj_matrix[i, j]:.1f}' for i, j in graph.edges()}, font_size=12, font_color='red')
     plt.axis("off")
