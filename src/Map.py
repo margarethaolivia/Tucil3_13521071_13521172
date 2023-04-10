@@ -2,6 +2,7 @@ import osmnx as ox
 import networkx as nx
 import UCS
 import Utils
+import AStar
 
 ox.settings.log_console=True
 ox.settings.use_cache=True
@@ -16,7 +17,7 @@ class MapPathSearch :
             coorPath.append((nodeData['y'],nodeData['x']))
         return coorPath
 
-    def search(startCoor, endCoor, mode='walk', method='UCS') :
+    def search(startCoor, endCoor, method, mode='walk') :
         # Mengembalikan list koordinat nodes dan graf (untuk keperluan fungsi lain)
         mapping_distance = max(int(Utils.Graph.eucliDistanceMap(startCoor[0],startCoor[1],endCoor[0],endCoor[1])), 1000)
         if (mapping_distance > 1000) :
@@ -28,9 +29,8 @@ class MapPathSearch :
         try :
             if (method == 'UCS') :
                 shortest_route, shortest_distance = UCS.UCSOSMNX.searchPath(startNode, endNode, graph)
-            elif(method == 'BuiltIn') :
-                shortest_route = nx.shortest_path(graph,startNode,endNode,weight='length')
-                shortest_distance = nx.shortest_path_length(graph,startNode,endNode,weight='length')
+            elif(method == 'A*') :
+                shortest_route, shortest_distance = AStar.AStarOSMNX.searchPath(startNode, endNode, graph)
         except :
             return -1,-1,None,False
         return shortest_route, shortest_distance, graph, True

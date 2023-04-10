@@ -40,42 +40,40 @@ class UCSOSMNX :
         if (startNode not in graph or destNode not in graph) :
             print("Coordinate not found in area")
             return
-        else :
-            if (startNode == destNode) :
-                return [startNode],0
-            liveNodes = []
-            visitedNodes = []
-            currNode = Node(startNode,0,0,[startNode])
-            edges = ox.graph_to_gdfs(graph,nodes=False)
-            while (currNode.number != destNode) :
-                visitedNodes.append(currNode.number)
-                try :
-                    neighbour = edges['length'].loc[currNode.number]
-                except :
-                    if (len(liveNodes) == 0) : 
-                        return
-                    currNode = liveNodes[0]
-                    liveNodes.remove(currNode)
-                    continue
-                for idx,l in neighbour.items() :
-                    if ((idx[0]) not in set(visitedNodes)) :
-                        foundSmaller = False
-                        for n in liveNodes : # Hapus elemen duplikat yang lebih besar dari elemen skrng dari prioqueue
-                            if (n.number == idx[0]) :
-                                if (currNode.distFromRoot + l < n.distFromRoot) :
-                                    liveNodes.remove(n)
-                                else :
-                                    foundSmaller = True
-                                break
-                        if (not(foundSmaller)) :
-                            liveNodes.append(Node(idx[0],currNode.distFromRoot + l,0,
-                                            currNode.prevPath + [idx[0]]))
-                if (len(liveNodes) == 0) :
+        # Jika simpul mulai sama dengan simpul tujuan
+        if (startNode == destNode) :
+            return [startNode],0
+        liveNodes = []
+        visitedNodes = []
+        currNode = Node(startNode,0,0,[startNode])
+        edges = ox.graph_to_gdfs(graph,nodes=False)
+        while (currNode.number != destNode) :
+            visitedNodes.append(currNode.number)
+            # Cari semua tetangga simpul ekspan
+            try :
+                neighbour = edges['length'].loc[currNode.number]
+            except : # Jika tidak ada tetangga, lanjut ke simpul hidup berikutnya
+                if (len(liveNodes) == 0) : # Jika sudah tidak ada simpul hidup dan belum sampai tujuan, berhenti
                     return
-                liveNodes.sort(key=lambda x : x.distFromRoot)
                 currNode = liveNodes[0]
                 liveNodes.remove(currNode)
-            return currNode.prevPath, currNode.distFromRoot
-
-# m = Graph.readMatrix("D:\OneDrive - Institut Teknologi Bandung\Folder Kuliah\Sem 4\Stima\Tucil 3\Tucil3_13521071_13521172\doc\dummy.txt")
-# a = UCS(0,6,m)
+                continue
+            for idx,l in neighbour.items() :
+                if ((idx[0]) not in set(visitedNodes)) :
+                    foundSmaller = False
+                    for n in liveNodes : # Hapus elemen duplikat yang lebih besar dari elemen skrng dari prioqueue, untuk meminimalkan jumlah pencarian
+                        if (n.number == idx[0]) :
+                            if (currNode.distFromRoot + l < n.distFromRoot) :
+                                liveNodes.remove(n)
+                            else :
+                                foundSmaller = True
+                            break
+                    if (not(foundSmaller)) :
+                        liveNodes.append(Node(idx[0],currNode.distFromRoot + l,0,
+                                        currNode.prevPath + [idx[0]]))
+            if (len(liveNodes) == 0) :
+                return
+            liveNodes.sort(key=lambda x : x.distFromRoot)
+            currNode = liveNodes[0]
+            liveNodes.remove(currNode)
+        return currNode.prevPath, currNode.distFromRoot

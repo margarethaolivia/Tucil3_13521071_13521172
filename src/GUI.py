@@ -28,6 +28,9 @@ root.geometry(f"{1100}x{700}")  # specify the max size the window can expand to
 searchModeMap = IntVar()
 searchModeGraph = IntVar()
 
+startNodeGraph = StringVar()
+endNodeGraph = StringVar()
+
 def openFile() :
     global file_path,m,coord
     file_path = askopenfile(mode='r', filetypes=[('text files', '*.txt')])
@@ -37,10 +40,19 @@ def openFile() :
         searchGraphBtn.configure(state=NORMAL)
         m,coord = Utils.Graph.readMatrix(file_path.name)
         plotGraph(m,coord)
+        nodeList = []
+        for i in range(len(m)) :
+            nodeList.append(str(i))
+        startCbBox.configure(values=nodeList)
+        endCbBox.configure(values=nodeList)
 
 def searchGraph() :
-    if(searchModeGraph == 1) :
-        shortest_route, shortest_dist = UCS.UCS.searchPath(0,6,m)
+    if(searchModeGraph.get() == 1) : # UCS
+        shortest_route, shortest_dist = UCS.UCS.searchPath(int(startNodeGraph.get()),int(endNodeGraph.get()),m)
+    elif (searchModeGraph.get() == 2) : # AStar
+        shortest_route, shortest_dist = AStar.AStar.searchPath(int(startNodeGraph.get()),int(endNodeGraph.get()),m,coord)
+    print(shortest_route, shortest_dist)
+    dist_lbl_graph.configure(text="Shortest distance : " + str(shortest_dist))
 
 # Map functions
 def add_start_coord(coords):
@@ -70,12 +82,12 @@ def search_path_map(mode='walk') :
     errorMapLbl.place_forget()
     if (searchModeMap.get() == 1) : # UCS
         method = 'UCS'
-    elif (searchModeMap.get() == 2) : # Built In
-        method = 'BuiltIn'
+    elif (searchModeMap.get() == 2) : # A*
+        method = 'A*'
     else :
         dist_lbl.configure(text="Select a serch method first !")
         return
-    shortest_route, shortest_distance, graph, success = Map.MapPathSearch.search(startCoord,endCoord,mode,method)
+    shortest_route, shortest_distance, graph, success = Map.MapPathSearch.search(startCoord,endCoord,method,mode)
     if (success) :
         shortest_route_coor = Map.MapPathSearch.convertPathToCoorPath(shortest_route,graph)
         map_widget.set_position(startCoord[0],startCoord[1])
@@ -97,7 +109,7 @@ def search_loc_map() :
         errorMapLbl.configure(text="Location not found", text_color="red")
         errorMapLbl.place(relx=0.53,rely=0.73)
 
-def plotGraph(m, coord):
+def plotGraph(m, coord, path=None):
     adj_matrix = np.array(m)
 
     # Create a directed weighted graph from the weighted directed adjacency matrix
@@ -132,15 +144,23 @@ dist_lbl_graph.place(relx=0.1,rely=0.65)
 uploadFileBtn = ctk.CTkButton(root,text="Upload",command=openFile)
 uploadFileBtn.place(relx=0.16,rely=0.7)
 
+# Graph start node and end node select
+startCbBox = ctk.CTkComboBox(root, values=[''], variable=startNodeGraph, width=100)
+startCbBox.set("Start Node")
+startCbBox.place(relx=0.12,rely=0.75)
+endCbBox = ctk.CTkComboBox(root, values=[''], variable=endNodeGraph, width=100)
+endCbBox.set("End Node")
+endCbBox.place(relx=0.24,rely=0.75)
+
 # Search graph button
 searchGraphBtn = ctk.CTkButton(root,text="Search",command=searchGraph,state="disabled")
-searchGraphBtn.place(relx=0.16,rely=0.75)
+searchGraphBtn.place(relx=0.16,rely=0.8)
 
 # Search mode select button graph
 UCSGraphBtn = ctk.CTkRadioButton(root,text="UCS", variable=searchModeGraph, value=1)
-UCSGraphBtn.place(relx=0.18,rely=0.8)
+UCSGraphBtn.place(relx=0.18,rely=0.85)
 AStarMapBtn = ctk.CTkRadioButton(root,text="A*", variable=searchModeGraph, value=2)
-AStarMapBtn.place(relx=0.18,rely=0.85)
+AStarMapBtn.place(relx=0.18,rely=0.9)
 
 # Search location textbox and button
 locTxtBox = ctk.CTkTextbox(root,width=300,height=30,activate_scrollbars=False)
@@ -158,8 +178,8 @@ searchMapBtn.place(relx=0.65,rely=0.75)
 # Search mode select button map
 UCSMapBtn = ctk.CTkRadioButton(root,text="UCS", variable=searchModeMap, value=1)
 UCSMapBtn.place(relx=0.665,rely=0.8)
-BuiltInMapBtn = ctk.CTkRadioButton(root,text="Built in", variable=searchModeMap, value=2)
-BuiltInMapBtn.place(relx=0.665,rely=0.85)
+AStarMapBtn = ctk.CTkRadioButton(root,text="A*", variable=searchModeMap, value=2)
+AStarMapBtn.place(relx=0.665,rely=0.85)
 
 # Map widget
 map_widget = tkMap.TkinterMapView(root, width=600, height=400, corner_radius=0)
@@ -174,23 +194,4 @@ map_widget.add_right_click_menu_command(label="Add end point",
                                         command=add_end_coord,
                                         pass_coords=True)
 
-# x = ['Col A', 'Col B', 'Col C']
-
-# y = [50, 20, 80]
-
-# fig = Figure(figsize=(4, 5))
-# (x=x, height=y)
-
-# # You can make your x axis labels vertical using the rotation
-# plt.xticks(x, rotation=90)
-
-# # specify the window as master
-# canvas = FigureCanvasTkAgg(fig, master=display_frame)
-# canvas.draw()
-# canvas.get_tk_widget().grid(row=1, column=0, ipadx=40, ipady=20)
-
-# # navigation toolbar
-# toolbarFrame = Frame(master=display_frame)
-# toolbarFrame.grid(row=2,column=0)
-# toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
 root.mainloop()
