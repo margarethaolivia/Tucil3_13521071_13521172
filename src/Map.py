@@ -1,4 +1,6 @@
 import osmnx as ox
+import networkx as nx
+import numpy as np
 import UCS
 import Utils
 import AStar
@@ -10,15 +12,26 @@ class MapPathSearch :
     boundBox = []
 
     def saveGraphFile(fileName) :
-        # Membaca graf dari file xml
-        MapPathSearch.savedGraph = ox.graph_from_xml(fileName)
-        MapPathSearch.boundBox = ox.graph_to_gdfs(MapPathSearch.savedGraph, edges=False).total_bounds
+        # Membaca graf peta dari file txt berisi matriks ketetanggan, koordinat, dan nama
+        m,coord,names = Utils.Util.readMatrix(fileName)
+        adj_matrix = np.array(m)
+        MapPathSearch.savedGraph = nx.Graph(adj_matrix)
+        minX = coord[0][0]
+        minY = coord[0][1]
+        maxX = coord[0][0]
+        maxY = coord[0][1]
+        for c in coord :
+            if (c[0] < minX) :
+                minX = c[0]
+            elif (c[0] > maxX) :
+                maxX = c[0]
+            if (c[1] < minY) :
+                minY = c[1]
+            elif (c[1] > maxY) :
+                maxY = c[1]
+        MapPathSearch.boundBox = [minX, minY, maxX, maxY]
         center = ((MapPathSearch.boundBox[0] + MapPathSearch.boundBox[2])/2, (MapPathSearch.boundBox[1] + MapPathSearch.boundBox[3])/2)
-        # nodesList = ox.graph_to_gdfs(MapPathSearch.savedGraph, edges=False).values
-        # coordList = []
-        # for n in nodesList :
-        #     coordList.append((n[0],n[1]))
-        return center #, coordList
+        return center, coord, names
     
     def saveGraphPoint(start, end) :
         # Download graph berdasarkan bounding box start,end
@@ -42,7 +55,7 @@ class MapPathSearch :
     
     def isInBoundBox(coor) :
         # Memeriksa apakah coor ada di dalam bounding box
-        if (not(any(MapPathSearch.boundBox))) :
+        if (len(MapPathSearch.boundBox) == 0) :
             return False
         elif (coor[0] < MapPathSearch.boundBox[0] or coor[0] > MapPathSearch.boundBox[2]
             or coor[1] < MapPathSearch.boundBox[1] or coor[1] > MapPathSearch.boundBox[3]) :
@@ -54,8 +67,12 @@ class MapPathSearch :
         if (not(MapPathSearch.isInBoundBox(startCoor)) or not(MapPathSearch.isInBoundBox(endCoor))) :
             print("Generating new graph")
             MapPathSearch.saveGraphPoint(startCoor, endCoor)
-        startNode = ox.distance.nearest_nodes(MapPathSearch.savedGraph,startCoor[0],startCoor[1])
-        endNode = ox.distance.nearest_nodes(MapPathSearch.savedGraph,endCoor[0],endCoor[1])
+        try :
+            startNode = ox.distance.nearest_nodes(MapPathSearch.savedGraph,startCoor[0],startCoor[1])
+            endNode = ox.distance.nearest_nodes(MapPathSearch.savedGraph,endCoor[0],endCoor[1])
+        except :
+            startNode = ox.distance.nearest_nodes(MapPathSearch.savedGraph,startCoor[0],startCoor[1])
+            endNode = ox.distance.nearest_nodes(MapPathSearch.savedGraph,endCoor[0],endCoor[1])
         try :
             if (method == 'UCS') :
                 shortest_route, shortest_distance = UCS.UCSOSMNX.searchPath(startNode, endNode, MapPathSearch.savedGraph)

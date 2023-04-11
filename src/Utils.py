@@ -2,8 +2,7 @@ import math
 
 # Representasi simpul yang berisi nomor simpul, nama simpul, dan jalur untuk mencapai simpul tersebut
 class Node :
-    def __init__(self,number,distFromRoot,prevPath,distFromDest=0,name="") :
-        self.name = name
+    def __init__(self,number,distFromRoot,prevPath,distFromDest=0) :
         self.number = number
         self.distFromRoot = distFromRoot
         self.distFromDest = distFromDest
@@ -23,15 +22,13 @@ class Util:
         f.seek(0)
         lines = f.readlines()
         for i in range(total_nodes):
-            m.append([float(x) for x in lines[i].split(' ') if x != ''])
+            m.append([float(x) for x in lines[i].split(' ')])
 
         for i in range(total_nodes, total_nodes*2):
-            coord.append([float(x) for x in lines[i].split(' ') if x != ''])
+            coord.append([float(x) for x in lines[i].split(' ')])
         
         for i in range(total_nodes*2, total_nodes*3):
             nodes_name.append(lines[i].strip())
-        
-        print(nodes_name)
 
         for i in range(len(m)):
             for j in range(len(m)):
@@ -50,14 +47,5 @@ class Util:
 
     def eucliDistanceMap(x1,y1,x2,y2) :
         return math.sqrt(pow(x2*111139-x1*111139,2) + pow(y2*111139-y1*111139,2))
-    
-    def seperateCoord(fileName) :
-        f = open(fileName, 'r')
-        lines = f.readlines()
-        for i in range(len(lines)) :
-            if (i%2 != 0) :
-                print(lines[i].rstrip('\n'))
-            else :
-                print(lines[i].rstrip('\n'), end=" ")
 
 # Util.seperateCoord("D:\\OneDrive - Institut Teknologi Bandung\\Folder Kuliah\\Sem 4\\Stima\\Tucil 3\\Tucil3_13521071_13521172\\test\\koordinat besar.txt")

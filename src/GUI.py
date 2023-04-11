@@ -21,6 +21,7 @@ startMarker = None
 endMarker = None
 m = None
 coord = None
+names = None
 
 root = ctk.CTk()  # create root window
 root.title("PathFinder A* & UCS")  # title of the GUI window
@@ -33,59 +34,62 @@ startNodeGraph = StringVar()
 endNodeGraph = StringVar()
 
 def openFileGraph() :
-    global m,coord
+    global m,coord, names
     file_path = askopenfile(mode='r', filetypes=[('text files', '*.txt')])
     if file_path is not None:
         fName = Path(file_path.name)
         filename.configure(text="File name : " + fName.name)
         searchGraphBtn.configure(state=NORMAL)
         try:
-            m, coord, nodes_name = Utils.Util.readMatrix(file_path.name)
-            plotGraph(m, coord, nodes_name)
+            m, coord, names = Utils.Util.readMatrix(file_path.name)
+            plotGraph(m,coord,names)
             nodeList = []
-            for i in range(len(m)):
-                nodeList.append(str(i))
+            for i in range(len(names)):
+                nodeList.append(names[i])
             startCbBox.configure(values=nodeList)
             endCbBox.configure(values=nodeList)
             errorLabel.configure(text="")
         except:
-            print("input not valid")
             errorLabel.configure(text="input not valid")
-
-def openFileMap() :
-    map_path = askopenfile(mode='r', filetypes=[('text files', '*.xml'),('text files', '*.osm')])
-    if (map_path is not None) :
-        center = Map.MapPathSearch.saveGraphFile(map_path.name)
-        map_widget.set_position(center[1],center[0])
-        msgMapLbl.configure(text= "Map uploaded", text_color="white")
-        msgMapLbl.place(relx=0.53,rely=0.72)
 
 def searchGraph() :
     try :
         if(searchModeGraph.get() == 1) : # UCS
-            shortest_route, shortest_dist = UCS.UCS.searchPath(int(startNodeGraph.get()),int(endNodeGraph.get()),m)
+            shortest_route, shortest_dist = UCS.UCS.searchPath(names.index(startNodeGraph.get()),names.index(endNodeGraph.get()),m)
         elif (searchModeGraph.get() == 2) : # AStar
-            shortest_route, shortest_dist = AStar.AStar.searchPath(int(startNodeGraph.get()),int(endNodeGraph.get()),m,coord)
-        plotGraph(m,coord,shortest_route)
+            shortest_route, shortest_dist = AStar.AStar.searchPath(names.index(startNodeGraph.get()),names.index(endNodeGraph.get()),m,coord)
+        route_names = []
+        for n in shortest_route :
+            route_names.append(names[n])
+        plotGraph(m,coord,names,route_names)
         dist_lbl_graph.configure(text="Shortest distance : " + str(shortest_dist) + " meter(s)")
         path = ""
-        for i in range(len(shortest_route)) :
-            if (i < len(shortest_route)-1) :
-                path += str(shortest_route[i]) + " - "
+        for i in range(len(route_names)) :
+            if (i < len(route_names)-1) :
+                path += str(route_names[i]) + " - "
             else :
-                path += str(shortest_route[i])
+                path += str(route_names[i])
         path_lbl_graph.configure(text="Path result : " + path, text_color="white")
     except :
         dist_lbl_graph.configure(text="Shortest distance : ")
         path_lbl_graph.configure(text="Path result : Path not found", text_color="red")
 
 # Map functions
-# def drawMarkers(coordList) :
-#     # Menggambar marker berdasarkan list koordinat
-#     count = 2
-#     for coord in coordList :
-#         map_widget.set_marker(coord[0], coord[1], text= "Node " +str(count))
-#         count += 1
+def drawMarkers(coordList, nameList) :
+    # Menggambar marker berdasarkan list koordinat
+    count = 2
+    for i in range (len(coordList)) :
+        map_widget.set_marker(coordList[i][1], coordList[i][0], text=(nameList[i] if nameList[i] != "" else "Node "+str(count)))
+        count += 1
+
+def openFileMap() :
+    map_path = askopenfile(mode='r', filetypes=[('text files', '*.txt')])
+    if (map_path is not None) :
+        center, coordList, names = Map.MapPathSearch.saveGraphFile(map_path.name)
+        map_widget.set_position(center[1],center[0])
+        msgMapLbl.configure(text= "Map uploaded", text_color="white")
+        msgMapLbl.place(relx=0.53,rely=0.72)
+        drawMarkers(coordList)
 
 def add_start_coord(coords):
     # Menambahkan titik awal pada peta
@@ -164,34 +168,39 @@ def search_loc_map() :
         msgMapLbl.configure(text="Location not found", text_color="red")
         msgMapLbl.place(relx=0.53,rely=0.72)
 
-def plotGraph(m, coord, nodes_name, path=[]):
+def plotGraph(m, coord, names, path=[]):
     # Menggambar graf di tempat yang disediakan
     adj_matrix = np.array(m)
 
     # Create a directed weighted graph from the weighted directed adjacency matrix
     graph = nx.Graph(adj_matrix)
 
-    # Plot the directed weighted graph
-    pos = {nodes_name[i]: tuple(coord[i]) for i in range(len(coord))}
-    nodes_name_mapping = {i: nodes_name[i] for i in range(len(nodes_name))}
-    graph = nx.relabel_nodes(graph, nodes_name_mapping)
+    # Convert 2D matrix to dictionary of node positions
+    pos = {names[i]: tuple(coord[i]) for i in range(len(coord))}
 
-    # Draw graph with fixed node positions and edge labels
-    a = fig.add_subplot(111)
+    nodes_name_mapping = {i: names[i] for i in range(len(names))}
+    graph = nx.relabel_nodes(graph, nodes_name_mapping)
+    # pos = {nodes_name_mapping[k]: pos[k] for k in nodes_name_mapping}
+
     path_edges = []
     if (len(path) > 0) :
         for i in range(len(path)-1):
             path_edges.append(tuple((path[i], path[i+1])))
 
-    # graph = nx.relabel_nodes(graph, {i: nodes_name[i] for i in range(len(nodes_name))})
-
-    nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color=['blue' if e in path else 'lightblue' for e in graph.nodes()], 
-                     node_size=500, font_size=14, font_weight='bold', edge_color=['red' if e in path_edges else 'black' for e in graph.edges()])
-    # nx.draw_networkx_edge_labels(graph, pos, edge_labels={(i, j): f'{adj_matrix[i, j]:.1f}' for i, j in graph.edges()}, font_size=12, font_color='red', rotate=False)
+    a = fig.add_subplot(111)
+    # Draw graph with fixed node positions and edge labels
+    nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color=['blue' if e in path else 'lightblue' for e in graph.nodes()],
+                    node_size=500, font_size=14, font_weight='bold',
+                    edge_color=['red' if e in path_edges else 'black' for e in graph.edges()])
     # edge_labels = nx.get_edge_attributes(self.graph, "weight")
     # nx.draw_networkx_edge_labels(self.graph, pos, edge_labels, rotate=False)
     plt.axis("off")
     canvas.draw()
+
+# close_window handling to prevent errors
+def close_window():
+    graphFrame.destroy()
+    root.destroy()
 
 # Title label
 title = ctk.CTkLabel(root,text="A* and UCS Pathfinder",font=('Arial',25))
@@ -274,4 +283,5 @@ map_widget.add_right_click_menu_command(label="Add end point",
                                         command=add_end_coord,
                                         pass_coords=True)
 
+root.protocol("WM_DELETE_WINDOW", close_window)
 root.mainloop()

@@ -66,11 +66,3 @@ class UCSOSMNX :
             currNode = liveNodes[0]
             liveNodes.remove(currNode)
         return currNode.prevPath, currNode.distFromRoot
-
-def printMatrix(m) :
-    for r in range (len(m)) :
-        for e in range(len(m[r])) :
-            if (e < len(m[r])-1) :
-                print(m[r][e], end=" ")
-            else :
-                print(m[r][e])
