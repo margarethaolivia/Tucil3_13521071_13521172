@@ -39,13 +39,18 @@ def openFileGraph() :
         fName = Path(file_path.name)
         filename.configure(text="File name : " + fName.name)
         searchGraphBtn.configure(state=NORMAL)
-        m,coord = Utils.Util.readMatrix(file_path.name)
-        plotGraph(m,coord)
-        nodeList = []
-        for i in range(len(m)) :
-            nodeList.append(str(i))
-        startCbBox.configure(values=nodeList)
-        endCbBox.configure(values=nodeList)
+        try:
+            m, coord = Utils.Util.readMatrix(file_path.name)
+            plotGraph(m, coord)
+            nodeList = []
+            for i in range(len(m)):
+                nodeList.append(str(i))
+            startCbBox.configure(values=nodeList)
+            endCbBox.configure(values=nodeList)
+            errorLabel.configure(text="")
+        except:
+            print("input not valid")
+            errorLabel.configure(text="input not valid")
 
 def openFileMap() :
     map_path = askopenfile(mode='r', filetypes=[('text files', '*.xml'),('text files', '*.osm')])
@@ -207,6 +212,9 @@ path_lbl_graph = ctk.CTkLabel(root,text="Path :")
 path_lbl_graph.place(relx=0.1,rely=0.68)
 uploadGraphBtn = ctk.CTkButton(root,text="Upload Graph",command=openFileGraph)
 uploadGraphBtn.place(relx=0.16,rely=0.73)
+
+errorLabel = ctk.CTkLabel(root,text="")
+errorLabel.place(relx=0.4,rely=0.68)
 
 # Graph start node and end node select
 startCbBox = ctk.CTkComboBox(root, values=[''], variable=startNodeGraph, width=100)

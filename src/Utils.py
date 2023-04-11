@@ -26,7 +26,13 @@ class Util:
         for i in range(total_nodes, total_lines):
             coord.append([float(x) for x in lines[i].split(' ') if x != ''])
 
+        for i in range(len(m)):
+            for j in range(len(m)):
+                if m[i][j] != m[j][i]:
+                    raise Exception
+
         f.close()
+        print(m)
         return m, coord
     
     def indexValid(i,mtrx) :
