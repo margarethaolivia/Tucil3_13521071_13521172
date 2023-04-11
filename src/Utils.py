@@ -2,15 +2,17 @@ import math
 
 # Representasi simpul yang berisi nomor simpul, nama simpul, dan jalur untuk mencapai simpul tersebut
 class Node :
-    def __init__(self,number,distFromRoot,distFromDest,prevPath,name="") :
+    def __init__(self,number,distFromRoot,prevPath,distFromDest=0,name="") :
         self.name = name
         self.number = number
         self.distFromRoot = distFromRoot
         self.distFromDest = distFromDest
         self.prevPath = prevPath
 
-class Graph:
+# Fungsi-fungsi yang berhubungan dengan graf
+class Util:
     def readMatrix(fileName):
+        # Membaca matriks ketetanggan dan koordinat tiap simpul dari file
         f = open(fileName, "r")
         total_lines = len(f.readlines())
         total_nodes = total_lines // 2
@@ -19,10 +21,10 @@ class Graph:
         f.seek(0)
         lines = f.readlines()
         for i in range(total_nodes):
-            m.append([int(x) for x in lines[i].split(' ')])
+            m.append([float(x) for x in lines[i].split(' ') if x != ''])
 
         for i in range(total_nodes, total_lines):
-            coord.append([int(x) for x in lines[i].split(' ')])
+            coord.append([float(x) for x in lines[i].split(' ') if x != ''])
 
         f.close()
         return m, coord
@@ -36,3 +38,14 @@ class Graph:
 
     def eucliDistanceMap(x1,y1,x2,y2) :
         return math.sqrt(pow(x2*111139-x1*111139,2) + pow(y2*111139-y1*111139,2))
+    
+    def seperateCoord(fileName) :
+        f = open(fileName, 'r')
+        lines = f.readlines()
+        for i in range(len(lines)) :
+            if (i%2 != 0) :
+                print(lines[i].rstrip('\n'))
+            else :
+                print(lines[i].rstrip('\n'), end=" ")
+
+# Util.seperateCoord("D:\\OneDrive - Institut Teknologi Bandung\\Folder Kuliah\\Sem 4\\Stima\\Tucil 3\\Tucil3_13521071_13521172\\test\\koordinat besar.txt")
