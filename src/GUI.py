@@ -40,8 +40,8 @@ def openFileGraph() :
         filename.configure(text="File name : " + fName.name)
         searchGraphBtn.configure(state=NORMAL)
         try:
-            m, coord = Utils.Util.readMatrix(file_path.name)
-            plotGraph(m, coord)
+            m, coord, nodes_name = Utils.Util.readMatrix(file_path.name)
+            plotGraph(m, coord, nodes_name)
             nodeList = []
             for i in range(len(m)):
                 nodeList.append(str(i))
@@ -164,7 +164,7 @@ def search_loc_map() :
         msgMapLbl.configure(text="Location not found", text_color="red")
         msgMapLbl.place(relx=0.53,rely=0.72)
 
-def plotGraph(m, coord, path=[]):
+def plotGraph(m, coord, nodes_name, path=[]):
     # Menggambar graf di tempat yang disediakan
     adj_matrix = np.array(m)
 
@@ -172,7 +172,9 @@ def plotGraph(m, coord, path=[]):
     graph = nx.Graph(adj_matrix)
 
     # Plot the directed weighted graph
-    pos = {i: tuple(coord[i]) for i in range(len(coord))}
+    pos = {nodes_name[i]: tuple(coord[i]) for i in range(len(coord))}
+    nodes_name_mapping = {i: nodes_name[i] for i in range(len(nodes_name))}
+    graph = nx.relabel_nodes(graph, nodes_name_mapping)
 
     # Draw graph with fixed node positions and edge labels
     a = fig.add_subplot(111)
@@ -180,10 +182,12 @@ def plotGraph(m, coord, path=[]):
     if (len(path) > 0) :
         for i in range(len(path)-1):
             path_edges.append(tuple((path[i], path[i+1])))
+
+    # graph = nx.relabel_nodes(graph, {i: nodes_name[i] for i in range(len(nodes_name))})
+
     nx.draw_networkx(graph, pos=pos, ax=a, with_labels=True, node_color=['blue' if e in path else 'lightblue' for e in graph.nodes()], 
                      node_size=500, font_size=14, font_weight='bold', edge_color=['red' if e in path_edges else 'black' for e in graph.edges()])
-    nx.draw_networkx_edge_labels(graph, pos, edge_labels={(
-        i, j): f'{adj_matrix[i, j]:.1f}' for i, j in graph.edges()}, font_size=12, font_color='red', rotate=False)
+    # nx.draw_networkx_edge_labels(graph, pos, edge_labels={(i, j): f'{adj_matrix[i, j]:.1f}' for i, j in graph.edges()}, font_size=12, font_color='red', rotate=False)
     # edge_labels = nx.get_edge_attributes(self.graph, "weight")
     # nx.draw_networkx_edge_labels(self.graph, pos, edge_labels, rotate=False)
     plt.axis("off")

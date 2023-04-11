@@ -15,16 +15,23 @@ class Util:
         # Membaca matriks ketetanggan dan koordinat tiap simpul dari file
         f = open(fileName, "r")
         total_lines = len(f.readlines())
-        total_nodes = total_lines // 2
+        total_nodes = total_lines // 3
         m = []
         coord = []
+        nodes_name = []
+
         f.seek(0)
         lines = f.readlines()
         for i in range(total_nodes):
             m.append([float(x) for x in lines[i].split(' ') if x != ''])
 
-        for i in range(total_nodes, total_lines):
+        for i in range(total_nodes, total_nodes*2):
             coord.append([float(x) for x in lines[i].split(' ') if x != ''])
+        
+        for i in range(total_nodes*2, total_nodes*3):
+            nodes_name.append(lines[i].strip())
+        
+        print(nodes_name)
 
         for i in range(len(m)):
             for j in range(len(m)):
@@ -32,8 +39,7 @@ class Util:
                     raise Exception
 
         f.close()
-        print(m)
-        return m, coord
+        return m, coord, nodes_name
     
     def indexValid(i,mtrx) :
         # checks if index i,j is valid in matrix mtrx
