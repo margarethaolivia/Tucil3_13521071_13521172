@@ -37,15 +37,6 @@ class Util:
 
         f.close()
         return m, coord, nodes_name
-    
-    def indexValid(i,mtrx) :
-        # checks if index i,j is valid in matrix mtrx
-        return (i >= 0 and i < len(mtrx))
-    
-    def eucliDistanceNormal(x1,y1,x2,y2) :
-        return math.sqrt(pow(x2*-x1,2) + pow(y2-y1,2))
 
     def eucliDistanceMap(x1,y1,x2,y2) :
         return math.sqrt(pow(x2*111139-x1*111139,2) + pow(y2*111139-y1*111139,2))
-
-# Util.seperateCoord("D:\\OneDrive - Institut Teknologi Bandung\\Folder Kuliah\\Sem 4\\Stima\\Tucil 3\\Tucil3_13521071_13521172\\test\\koordinat besar.txt")

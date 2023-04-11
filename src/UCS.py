@@ -1,14 +1,10 @@
 from Utils import Node
-from Utils import Util
 import osmnx as ox
 
 class UCS :
     @staticmethod
     def searchPath(startNodeNum, destNodeNum, matrix) :
         # Route searching pada matriks ketetanggaan
-        if (not(Util.indexValid(startNodeNum,matrix)) or not(Util.indexValid(destNodeNum,matrix))) : # Periksa apakah node valid
-            print("Nodes not valid")
-            return
         liveNodes = []
         visitedNodesNum = []
         currNode = Node(startNodeNum,0,[startNodeNum])          # Simpul ekspan
@@ -49,15 +45,6 @@ class UCSOSMNX :
                 continue
             for idx,l in neighbour.items() :
                 if ((idx[0]) not in set(visitedNodes)) :
-                    # foundSmaller = False 
-                    # for n in liveNodes :
-                    #     if (n.number == idx[0]) :
-                    #         if (currNode.distFromRoot + l < n.distFromRoot) : # Hapus elemen duplikat yang lebih besar jaraknya
-                    #             liveNodes.remove(n)
-                    #         else :
-                    #             foundSmaller = True
-                    #         break
-                    # if (not(foundSmaller)) :
                     liveNodes.append(Node(idx[0],currNode.distFromRoot + l,
                                     currNode.prevPath + [idx[0]]))
             if (len(liveNodes) == 0) :

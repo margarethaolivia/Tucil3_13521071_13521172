@@ -56,15 +56,6 @@ class AStarOSMNX :
             # Masukkan tetangga ke daftar simpul hidup
             for idx,l in neighbour.items() :
                 if ((idx[0]) not in set(visitedNodes)) :
-                    # foundSmaller = False
-                    # for n in liveNodes :
-                    #     if (n.number == idx[0]) :
-                    #         if (currNode.distFromRoot + l < n.distFromRoot) :
-                    #             liveNodes.remove(n)
-                    #         else :
-                    #             foundSmaller = True
-                    #         break
-                    # if (not(foundSmaller)) :
                     liveNodes.append(Node(idx[0], currNode.distFromRoot+l, 
                                        currNode.prevPath + [idx[0]], 
                                        AStar.euc_dist((coord[0].loc[idx[0]],coord[1].loc[idx[0]]), destCoord)))
