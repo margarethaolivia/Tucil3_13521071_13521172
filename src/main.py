@@ -15,6 +15,9 @@ import Utils
 import Map
 import AStar
 
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
 startCoord = None
 endCoord = None
 startMarker = None
@@ -26,7 +29,7 @@ names = None
 
 root = ctk.CTk()  # create root window
 root.title("PathFinder A* & UCS")  # title of the GUI window
-root.geometry(f"{1100}x{700}")  # specify the max size the window can expand to
+root.geometry(f"{1050}x{650}")  # specify the max size the window can expand to
 
 searchModeMap = IntVar()
 searchModeGraph = IntVar()
@@ -208,12 +211,6 @@ def plotGraph(m, coord, names, path=[]):
     plt.axis("off")
     canvas.draw()
 
-# close_window handling to prevent errors
-def close_window():
-    canvas.get_tk_widget().destroy()
-    graphFrame.destroy()
-    root.destroy()
-
 # Title label
 title = ctk.CTkLabel(root,text="A* and UCS Pathfinder",font=('Arial',25))
 title.place(relx=0.37,rely=0.05)
@@ -295,5 +292,5 @@ map_widget.add_right_click_menu_command(label="Add end point",
                                         command=add_end_coord,
                                         pass_coords=True)
 
-root.protocol("WM_DELETE_WINDOW", close_window)
+root.protocol("WM_DELETE_WINDOW", root.quit)
 root.mainloop()
