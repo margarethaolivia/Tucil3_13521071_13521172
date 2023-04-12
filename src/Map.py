@@ -5,7 +5,7 @@ import UCS
 import Utils
 import AStar
 
-ox.settings.use_cache=True
+ox.settings.use_cache=False
 
 class MapPathSearch :
     savedGraph = None
