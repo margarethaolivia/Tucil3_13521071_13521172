@@ -29,7 +29,7 @@ names = None
 
 root = ctk.CTk()  # create root window
 root.title("PathFinder A* & UCS")  # title of the GUI window
-root.geometry(f"{1050}x{650}")  # specify the max size the window can expand to
+root.geometry(f"{1100}x{700}")  # specify the max size the window can expand to
 
 searchModeMap = IntVar()
 searchModeGraph = IntVar()
